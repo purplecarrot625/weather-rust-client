@@ -1,38 +1,29 @@
-mod model;
+//
+// Check out `quicktype`.
+//   On GitHub: https://github.com/quicktype/quicktype
+//   In action: https://app.quicktype.io
+//
 
-#[tokio::main]
-async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    // A hard-coded JSON
-    let json = r#"
-            {
-              "main": {
-                "temp": 30.94
-              }
-            }
-        "#;
+use serde::{Serialize, Deserialize};
 
-    // Deserialize the hardcoded JSON into a Weather struct
-    let weather1: model::Weather = serde_json::from_str(json).unwrap();
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Weather {
+    pub(crate) main: Main,
+}
 
-    println!("\nWeather from a JSON we hard-coded locally:\n{:?}", weather1);
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Main {
+    pub(crate) temp: f64,
+}
 
-    //
-    // Now that we know we can deserialize a hard-coded JSON into a struct model,
-    // let's see if we can fetch the weather from the backend.
-    //
+#[derive(Debug, Serialize, Deserialize)]
+pub struct AuthModel {
+    #[serde(rename = "access-token")]
+    pub(crate) access_token: String,
+    expires: String,
+}
 
-    let client = reqwest::Client::new();
-
-    let response = client
-        .get("https://api.openweathermap.org/data/2.5/weather?q=corvallis&appid=b98e3f089c86867862f28236d174368a&&units=imperial")
-        .send()
-        .await?;
-
-    let weather2 = response
-        .json::<model::Weather>()
-        .await?;
-
-    println!("\nWeather from openweathermap.org:\n {:?}", weather2);
-
-    Ok(())
+#[derive(Debug, Serialize, Deserialize)]
+pub struct HelloModel {
+    pub(crate) greeting: String,
 }
